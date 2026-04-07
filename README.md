@@ -77,40 +77,6 @@ You can download the pre-trained model weights from the following link:
 
 Download the checkpoints and place them in the project root directory.
 
-## Model Architecture
-
-### Traditional Machine Learning Models
-- **KNN**: K-Nearest Neighbors
-- **SVM**: Support Vector Machine
-- **Decision Tree**: CART Decision Tree
-- **Naive Bayes**: Gaussian Naive Bayes
-- **LDA**: Linear Discriminant Analysis
-
-### CNN Model
-The CNN model consists of:
-- 1 convolutional layer with 32 filters
-- Batch normalization
-- ReLU activation
-- Max pooling
-- Fully connected layer with 3 output classes
-
-## Classification Results
-
-The system classifies images into three categories:
-- **Healthy**: No Parkinson's disease
-- **Early PD**: Early stage Parkinson's disease
-- **Advanced PD**: Advanced stage Parkinson's disease
-
-## Weighted Voting
-
-The final prediction uses a weighted voting system based on model performance:
-- CNN: 7.0
-- Naive Bayes: 1.5
-- KNN: 0.3
-- SVM: 0.3
-- Decision Tree: 0.3
-- LDA: 0.6
-
 ## License
 
 This project is for research purposes only.
