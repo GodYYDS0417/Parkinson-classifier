@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkinson's Disease Image Classification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .upload-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        #upload-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #upload-btn:hover {
+            background-color: #45a049;
+        }
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .final-result {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4CAF50;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-input-wrapper label {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .file-input-wrapper #file-name {
+            display: inline-block;
+            vertical-align: middle;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Parkinson's Disease Image Classification</h1>
+        
+        <div class="upload-section">
+            <h2>Upload Image</h2>
+            <div class="file-input-wrapper">
+                <input type="file" id="file-input" accept="image/*">
+                <label for="file-input">Choose File</label>
+                <span id="file-name">No file selected</span>
+            </div>
+            <br>
+            <button id="upload-btn">Start Analysis</button>
+        </div>
+        
+
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Analyzing, please wait...</p>
+        </div>
+        
+        <div class="result-section">
+            <h2>Analysis Result</h2>
+            <div id="result-content">
+                <p>Please upload an image for analysis</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 更新文件名显示
+                document.getElementById('file-name').textContent = file.name;
+            } else {
+                // 重置文件名显示
+                document.getElementById('file-name').textContent = 'No file selected';
+            }
+        });
+        
+        document.getElementById('upload-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Show loading status
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.result-section').style.display = 'none';
+            
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Send request
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading status
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.result-section').style.display = 'block';
+                
+                // Display result
+                const resultContent = document.getElementById('result-content');
+                resultContent.innerHTML = `
+                    <div class="result-item final-result">
+                        <strong>Final Result:</strong> ${data.final}
+                    </div>
+                    <h3>Individual Model Predictions:</h3>
+                    <div class="result-item">
+                        <strong>KNN:</strong> ${data.individual.knn}<br>
+                        <strong>SVM:</strong> ${data.individual.svm}<br>
+                        <strong>Decision Tree:</strong> ${data.individual.tree}<br>
+                        <strong>Naive Bayes:</strong> ${data.individual.nb}<br>
+                        <strong>Linear Discriminant Analysis:</strong> ${data.individual.ld}<br>
+                        <strong>CNN:</strong> ${data.individual.cnn}
+                    </div>
+                `;
+            })
+            .catch(error => {
+                // Hide loading status
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.result-section').style.display = 'block';
+                
+                // Display error message
+                const resultContent = document.getElementById('result-content');
+                resultContent.innerHTML = `<p style="color: red;">Analysis failed: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
