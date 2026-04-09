@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 from sklearn.model_selection import cross_val_score, KFold
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -21,6 +22,7 @@ def augment_image(image):
     augmented.append(flipped)
     
     return augmented
+
 from sklearn.preprocessing import StandardScaler
 import joblib
 
@@ -49,6 +51,7 @@ def customreader(filename):
     square_image[h_start:h_start+height, w_start:w_start+width] = data
     data = cv2.resize(square_image, (100, 100))
     
+
     return data
 
 def load_data(dataset_path):
@@ -77,6 +80,7 @@ def load_data(dataset_path):
                         # 对于CNN模型，保持3通道
                         data_cnn.append(img)
                         labels.append(class_label)
+
     
     return np.array(data), np.array(data_cnn), np.array(labels)
 
@@ -91,6 +95,7 @@ def train_models(X, X_cnn, y):
     
     # 保存标准化器
     joblib.dump(scaler, 'checkpoints/scaler.pkl')
+
     
     # 定义分类器
     classifiers = {
@@ -113,6 +118,7 @@ def train_models(X, X_cnn, y):
         
         # 保存模型
         joblib.dump(clf, f'checkpoints/{name.lower()}_model.pkl')
+
         
         results[name] = {
             'accuracy': np.mean(scores),
@@ -141,6 +147,7 @@ def train_models(X, X_cnn, y):
                 x = self.conv(x)
                 x = self.bn(x)
                 x = self.relu(x)
+
                 x = self.flatten(x)
                 x = self.fc(x)
                 return x
@@ -161,6 +168,7 @@ def train_models(X, X_cnn, y):
         
         # 训练模型
         epochs = 50  # 训练50轮
+
         for epoch in range(epochs):
             running_loss = 0.0
             correct = 0
@@ -190,6 +198,7 @@ def train_models(X, X_cnn, y):
         
         # 保存模型
         torch.save(model.state_dict(), 'checkpoints/cnn_model.pth')
+
         
         # 评估模型
         model.eval()
@@ -211,6 +220,7 @@ def train_models(X, X_cnn, y):
 def main():
     # 数据集路径
     dataset_path = '../split_PD_datasets'
+
     
     # 加载数据
     print('加载数据中...')

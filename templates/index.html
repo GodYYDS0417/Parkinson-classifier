@@ -147,6 +147,7 @@
             margin-top: 20px;
         }
         
+
         #upload-btn {
             background-color: #4CAF50;
             color: white;
@@ -195,6 +196,7 @@
         }
         
         /* 加载状态 */
+
         .loading {
             display: none;
             text-align: center;
@@ -220,6 +222,7 @@
         .result-section {
             display: none;
             width: 100%;
+
         }
     </style>
 </head>
@@ -275,6 +278,7 @@
                 <div style="margin-top: 30px;">
                     <button id="reupload-btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-size: 16px;">Upload Another Image</button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -316,6 +320,7 @@
             formData.append('file', file);
             
             // 发送请求
+
             fetch('/predict', {
                 method: 'POST',
                 body: formData
@@ -361,6 +366,7 @@
                 
                 // 显示错误信息
                 alert('Analysis failed: ' + error.message);
+
             });
         });
     </script>
