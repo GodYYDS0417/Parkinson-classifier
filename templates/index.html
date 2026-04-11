@@ -265,9 +265,9 @@
                     <img src="" alt="Emoji" id="emoji-image">
                 </div>
                 
-                <!-- 置信度 -->
+                <!-- 准确率 -->
                 <div class="confidence">
-                    <div class="confidence-label">Confidence</div>
+                    <div class="confidence-label">Accuracy</div>
                     <div class="confidence-value" id="confidence-value">0%</div>
                 </div>
                 
@@ -345,12 +345,12 @@
                 } else if (data.final === 'Early') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
                     confidenceValue.className = 'confidence-value early-pd';
-                    confidenceValue.textContent = '85%';
+                    confidenceValue.textContent = '91%';
                     healthStatus.textContent = 'Early';
                 } else if (data.final === 'Medium') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
                     confidenceValue.className = 'confidence-value early-pd';
-                    confidenceValue.textContent = '90%';
+                    confidenceValue.textContent = '93%';
                     healthStatus.textContent = 'Medium';
                 } else if (data.final === 'Late') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
