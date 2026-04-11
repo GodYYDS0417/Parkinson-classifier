@@ -337,25 +337,26 @@
                 const healthStatus = document.getElementById('health-status');
                 
                 // 根据结果设置不同的表情和样式
+                const accuracy = Math.round(data.confidence * 100);
                 if (data.final === 'Healthy') {
                     emojiImage.src = '/微信图片_20260408000934(1).png';
                     confidenceValue.className = 'confidence-value healthy';
-                    confidenceValue.textContent = '95%';
+                    confidenceValue.textContent = accuracy + '%';
                     healthStatus.textContent = 'Healthy';
                 } else if (data.final === 'Early') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
                     confidenceValue.className = 'confidence-value early-pd';
-                    confidenceValue.textContent = '91%';
+                    confidenceValue.textContent = accuracy + '%';
                     healthStatus.textContent = 'Early';
                 } else if (data.final === 'Medium') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
                     confidenceValue.className = 'confidence-value early-pd';
-                    confidenceValue.textContent = '93%';
+                    confidenceValue.textContent = accuracy + '%';
                     healthStatus.textContent = 'Medium';
                 } else if (data.final === 'Late') {
                     emojiImage.src = '/微信图片_20260408000934 (1)(1)(1).png';
                     confidenceValue.className = 'confidence-value advanced-pd';
-                    confidenceValue.textContent = '95%';
+                    confidenceValue.textContent = accuracy + '%';
                     healthStatus.textContent = 'Late';
                 }
             })

@@ -131,13 +131,23 @@ def predict(image):
     
     # 所有模型预测
     predictions = {}
+    confidences = {}
     
     # 传统模型预测右侧（帕金森）
     for name, model in models.items():
         pred = model.predict([right_processed])[0]
         predictions[name] = int(pred)
+        
+        # 计算置信度
+        if hasattr(model, 'predict_proba'):
+            prob = model.predict_proba([right_processed])[0]
+            confidences[name] = float(max(prob))
+        else:
+            # 如果模型没有predict_proba方法，使用默认置信度
+            confidences[name] = 0.9
     
     # CNN模型预测右侧（帕金森）（如果PyTorch可用）
+    cnn_confidence = 0.9
     if pytorch_available and cnn_model:
         # 预处理右侧图像（用于CNN）
         # 保持RGB通道
@@ -154,13 +164,19 @@ def predict(image):
         cnn_image = torch.tensor(cnn_image, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)  # 转换为(batch, channels, height, width)
         
         with torch.no_grad():
-            cnn_pred = torch.argmax(cnn_model(cnn_image), dim=1).item()
+            output = cnn_model(cnn_image)
+            cnn_pred = torch.argmax(output, dim=1).item()
+            # 计算置信度
+            probabilities = torch.nn.functional.softmax(output, dim=1).numpy()[0]
+            cnn_confidence = float(max(probabilities))
         predictions['cnn'] = int(cnn_pred)
-        print(f"CNN prediction: {cnn_pred}")
+        confidences['cnn'] = cnn_confidence
+        print(f"CNN prediction: {cnn_pred}, confidence: {cnn_confidence}")
     else:
         print(f"PyTorch available: {pytorch_available}, CNN model: {cnn_model}")
     
     print(f"Predictions: {predictions}")
+    print(f"Confidences: {confidences}")
     
     # 确保至少有一个预测结果
     if not predictions:
@@ -169,7 +185,8 @@ def predict(image):
     # 强制使用CNN模型的预测结果
     if 'cnn' in predictions:
         final_pred = predictions['cnn']
-        print(f"Using CNN prediction: {final_pred}")
+        final_confidence = confidences.get('cnn', 0.9)
+        print(f"Using CNN prediction: {final_pred}, confidence: {final_confidence}")
     else:
         # 如果没有CNN预测，使用加权投票
         weighted_votes = {0: 0, 1: 0, 2: 0, 3: 0}
@@ -185,11 +202,15 @@ def predict(image):
         
         # 选择权重最高的预测结果
         final_pred = max(weighted_votes, key=weighted_votes.get)
-        print(f"Using weighted voting: {final_pred}")
+        # 计算平均置信度
+        avg_confidence = sum(confidences.values()) / len(confidences) if confidences else 0.9
+        final_confidence = avg_confidence
+        print(f"Using weighted voting: {final_pred}, confidence: {final_confidence}")
     
     return {
         'individual': predictions,
-        'final': final_pred
+        'final': final_pred,
+        'confidence': final_confidence
     }
 
 @app.route('/')
@@ -232,7 +253,8 @@ def predict_api():
     # 格式化结果
     formatted_result = {
         'final': class_names.get(result['final'], '未知'),
-        'individual': {k: class_names.get(v, '未知') for k, v in result['individual'].items()}
+        'individual': {k: class_names.get(v, '未知') for k, v in result['individual'].items()},
+        'confidence': float(result.get('confidence', 0.9))
     }
     
     return jsonify(formatted_result)
